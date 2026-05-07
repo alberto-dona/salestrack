@@ -2840,14 +2840,14 @@ function toggleCliente(id) {
 // ── CRUD CLIENTI ─────────────────────────────────────────────
 function openAddCliente() {
   provvEditId = null;
-  document.getElementById('mc-title').textContent = 'Nuovo cliente';
-  document.getElementById('mc-id').value = '';
-  document.getElementById('mc-tipo').value = 'res';
-  document.getElementById('mc-nome').value = '';
-  document.getElementById('mc-indirizzo').value = '';
-  document.getElementById('mc-tel').value = '';
-  document.getElementById('mc-note').value = '';
-  document.getElementById('mc-prov').value = '8';
+  document.getElementById('mc2-title').textContent = 'Nuovo cliente';
+  document.getElementById('mc2-id').value = '';
+  document.getElementById('mc2-tipo').value = 'res';
+  document.getElementById('mc2-nome').value = '';
+  document.getElementById('mc2-indirizzo').value = '';
+  document.getElementById('mc2-tel').value = '';
+  document.getElementById('mc2-note').value = '';
+  document.getElementById('mc2-prov').value = '8';
   openModalById('modal-cliente');
 }
 
@@ -2857,19 +2857,20 @@ function openEditCliente(id) {
   const c = clienti.find(x => x.id === id);
   if (!c) return;
   provvEditId = id;
-  document.getElementById('mc-title').textContent = 'Modifica cliente';
-  document.getElementById('mc-id').value = id;
-  document.getElementById('mc-tipo').value = c.tipo || 'res';
-  document.getElementById('mc-nome').value = c.nome || '';
-  document.getElementById('mc-indirizzo').value = c.indirizzo || '';
-  document.getElementById('mc-tel').value = c.tel || '';
-  document.getElementById('mc-note').value = c.note || '';
-  document.getElementById('mc-prov').value = c.provPct || 8;
+  document.getElementById('mc2-title').textContent = 'Modifica cliente';
+  document.getElementById('mc2-id').value = id;
+  document.getElementById('mc2-tipo').value = c.tipo || 'res';
+  document.getElementById('mc2-nome').value = c.nome || '';
+  document.getElementById('mc2-indirizzo').value = c.indirizzo || '';
+  document.getElementById('mc2-tel').value = c.tel || '';
+  document.getElementById('mc2-note').value = c.note || '';
+  document.getElementById('mc2-prov').value = c.provPct || 8;
   openModalById('modal-cliente');
 }
 
 function saveCliente() {
-  const nome = document.getElementById('mc-nome').value.trim();
+  const nomeEl = document.getElementById('mc2-nome');
+  const nome = (nomeEl ? nomeEl.value : '').replace(/^\s+|\s+$/g,'');
   if (!nome) { alert('Inserisci il nome del cliente'); return; }
   const yd = provvYd();
   if (!Array.isArray(yd.clienti)) yd.clienti = [];
@@ -2878,23 +2879,23 @@ function saveCliente() {
     const idx = yd.clienti.findIndex(c => c.id === provvEditId);
     if (idx >= 0) {
       yd.clienti[idx] = { ...yd.clienti[idx],
-        tipo: document.getElementById('mc-tipo').value,
-        nome: document.getElementById('mc-nome').value,
-        indirizzo: document.getElementById('mc-indirizzo').value,
-        tel: document.getElementById('mc-tel').value,
-        note: document.getElementById('mc-note').value,
-        provPct: parseFloat(document.getElementById('mc-prov').value) || 8,
+        tipo: document.getElementById('mc2-tipo').value,
+        nome: document.getElementById('mc2-nome').value,
+        indirizzo: document.getElementById('mc2-indirizzo').value,
+        tel: document.getElementById('mc2-tel').value,
+        note: document.getElementById('mc2-note').value,
+        provPct: parseFloat(document.getElementById('mc2-prov').value) || 8,
       };
     }
   } else {
     yd.clienti.push({
       id: provvUid(),
-      tipo: document.getElementById('mc-tipo').value,
-      nome: document.getElementById('mc-nome').value,
-      indirizzo: document.getElementById('mc-indirizzo').value,
-      tel: document.getElementById('mc-tel').value,
-      note: document.getElementById('mc-note').value,
-      provPct: parseFloat(document.getElementById('mc-prov').value) || 8,
+      tipo: document.getElementById('mc2-tipo').value,
+      nome: document.getElementById('mc2-nome').value,
+      indirizzo: document.getElementById('mc2-indirizzo').value,
+      tel: document.getElementById('mc2-tel').value,
+      note: document.getElementById('mc2-note').value,
+      provPct: parseFloat(document.getElementById('mc2-prov').value) || 8,
       contratti: [],
     });
   }
@@ -3170,34 +3171,34 @@ self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r
 <!-- MODAL ADD/EDIT CLIENTE -->
 <div class="modal-bg" id="modal-cliente">
   <div class="modal" style="max-width:440px">
-    <h3 id="mc-title">Nuovo cliente</h3>
-    <input type="hidden" id="mc-id">
+    <h3 id="mc2-title">Nuovo cliente</h3>
+    <input type="hidden" id="mc2-id">
     <div class="modal-field">
       <label>Tipologia</label>
-      <select id="mc-tipo">
+      <select id="mc2-tipo">
         <option value="res">🏠 Residenziale</option>
         <option value="com">🏢 Commerciale</option>
       </select>
     </div>
     <div class="modal-field">
       <label>Nome / Ragione sociale</label>
-      <input type="text" id="mc-nome" placeholder="Es: Mario Rossi / Azienda SRL">
+      <input type="text" id="mc2-nome" placeholder="Es: Mario Rossi / Azienda SRL">
     </div>
     <div class="modal-field">
       <label>Indirizzo / Comune</label>
-      <input type="text" id="mc-indirizzo" placeholder="Es: Via Roma 1, Milano">
+      <input type="text" id="mc2-indirizzo" placeholder="Es: Via Roma 1, Milano">
     </div>
     <div class="modal-field">
       <label>Telefono</label>
-      <input type="text" id="mc-tel" placeholder="Es: 333 1234567">
+      <input type="text" id="mc2-tel" placeholder="Es: 333 1234567">
     </div>
     <div class="modal-field">
       <label>Note</label>
-      <textarea id="mc-note" rows="2" placeholder="Annotazioni libere..."></textarea>
+      <textarea id="mc2-note" rows="2" placeholder="Annotazioni libere..."></textarea>
     </div>
     <div class="modal-field">
       <label>Provvigione base % (default 8%)</label>
-      <input type="number" id="mc-prov" value="8" min="0" max="100" step="0.5">
+      <input type="number" id="mc2-prov" value="8" min="0" max="100" step="0.5">
     </div>
     <div class="modal-btns">
       <button class="cancel" onclick="closeMC()">Annulla</button>
