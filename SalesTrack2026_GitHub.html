@@ -3214,7 +3214,7 @@ self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r
     <div id="stati-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
     <button style="width:100%;padding:9px;background:none;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;border-radius:8px;cursor:pointer;margin-bottom:14px" onclick="addStato()">+ Aggiungi stato</button>
     <div class="modal-btns">
-      <button class="cancel" onclick="closeModal('modal-stati')">Chiudi</button>
+    <button class="cancel" onclick="closeM('modal-stati')">Chiudi</button>
       <button class="confirm" onclick="saveStati()">Salva stati</button>
     </div>
   </div>
