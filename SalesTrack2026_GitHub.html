@@ -2637,6 +2637,13 @@ function renderProvvYears() {
   ).join('');
 }
 
+function selPvYear(y) {
+  pvYear = y;
+  if (!pvData[y]) pvData[y] = { clienti: [] };
+  renderPv();
+  renderProvvKPI();
+}
+
 function selProvvYear(y) {
   provvYear = y;
   if (!provvData[y]) provvData[y] = { clienti: [] };
@@ -2839,67 +2846,27 @@ function toggleCliente(id) {
 
 // ── CRUD CLIENTI ─────────────────────────────────────────────
 function openAddCliente() {
-  provvEditId = null;
+  pvEditId = null;
+  document.getElementById('mc-mode').value = 'pv';
   document.getElementById('mc-title').textContent = 'Nuovo cliente';
   document.getElementById('mc-id').value = '';
   document.getElementById('mc-tipo').value = 'res';
   document.getElementById('mc-nome').value = '';
-  document.getElementById('mc-indirizzo').value = '';
+  document.getElementById('mc-ind').value = '';
   document.getElementById('mc-tel').value = '';
-  document.getElementById('mc-note').value = '';
   document.getElementById('mc-prov').value = '8';
-  openModalById('modal-cliente');
+  document.getElementById('mc-note').value = '';
+  openM('modal-clie');
+  setTimeout(function(){ var e=document.getElementById('mc-nome'); if(e) e.focus(); }, 100);
 }
 
 function openEditCliente(id) {
-  const yd = provvYd();
-  const clienti = Array.isArray(yd.clienti) ? yd.clienti : Object.values(yd.clienti || {});
-  const c = clienti.find(x => x.id === id);
-  if (!c) return;
-  provvEditId = id;
-  document.getElementById('mc-title').textContent = 'Modifica cliente';
-  document.getElementById('mc-id').value = id;
-  document.getElementById('mc-tipo').value = c.tipo || 'res';
-  document.getElementById('mc-nome').value = c.nome || '';
-  document.getElementById('mc-indirizzo').value = c.indirizzo || '';
-  document.getElementById('mc-tel').value = c.tel || '';
-  document.getElementById('mc-note').value = c.note || '';
-  document.getElementById('mc-prov').value = c.provPct || 8;
-  openModalById('modal-cliente');
+  // Route to Sistema 1 (pvData/Firebase)
+  openEditClie(id);
 }
 
 function saveCliente() {
-  const nome = document.getElementById('mc-nome').value.trim();
-  if (!nome) { alert('Inserisci il nome del cliente'); return; }
-  const yd = provvYd();
-  if (!Array.isArray(yd.clienti)) yd.clienti = [];
-
-  if (provvEditId) {
-    const idx = yd.clienti.findIndex(c => c.id === provvEditId);
-    if (idx >= 0) {
-      yd.clienti[idx] = { ...yd.clienti[idx],
-        tipo: document.getElementById('mc-tipo').value,
-        nome: document.getElementById('mc-nome').value,
-        indirizzo: document.getElementById('mc-indirizzo').value,
-        tel: document.getElementById('mc-tel').value,
-        note: document.getElementById('mc-note').value,
-        provPct: parseFloat(document.getElementById('mc-prov').value) || 8,
-      };
-    }
-  } else {
-    yd.clienti.push({
-      id: provvUid(),
-      tipo: document.getElementById('mc-tipo').value,
-      nome: document.getElementById('mc-nome').value,
-      indirizzo: document.getElementById('mc-indirizzo').value,
-      tel: document.getElementById('mc-tel').value,
-      note: document.getElementById('mc-note').value,
-      provPct: parseFloat(document.getElementById('mc-prov').value) || 8,
-      contratti: [],
-    });
-  }
-  storeProvv(); closeMC(); renderProvv();
-  showToast(provvEditId ? 'Cliente aggiornato ✓' : 'Cliente aggiunto ✓');
+  saveClie();
 }
 
 function deleteCliente(id) {
@@ -2911,7 +2878,7 @@ function deleteCliente(id) {
   showToast('Cliente eliminato', 'err');
 }
 
-function closeMC() { closeModalById('modal-cliente'); }
+function closeMC() { closeM('modal-clie'); }
 
 // ── CRUD CONTRATTI ────────────────────────────────────────────
 function addContratto(clienteId) {
@@ -3004,7 +2971,7 @@ function openStati() {
       <input value="${escHtml(s)}" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:8px 10px;border-radius:8px;outline:none" id="stato-${i}">
       ${i > 0 ? `<button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px">✕</button>` : '<span style="width:20px"></span>'}
     </div>`).join('');
-  openModalById('modal-stati');
+  openM('modal-stati');
 }
 
 function addStato() {
@@ -3019,8 +2986,11 @@ function addStato() {
 
 function saveStati() {
   const inputs = document.querySelectorAll('#stati-list input');
-  provvData.stati = [...inputs].map(i => i.value.trim()).filter(Boolean);
-  storeProvv(); closeModalById('modal-stati');
+  const newStati = [...inputs].map(i => i.value.trim()).filter(Boolean);
+  pvData.stati = newStati;
+  provvData.stati = newStati;
+  storePv();
+  closeM('modal-stati');
   showToast('Stati salvati ✓');
 }
 
@@ -3214,7 +3184,7 @@ self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r
     <div id="stati-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
     <button style="width:100%;padding:9px;background:none;border:1px dashed var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;border-radius:8px;cursor:pointer;margin-bottom:14px" onclick="addStato()">+ Aggiungi stato</button>
     <div class="modal-btns">
-    <button class="cancel" onclick="closeM('modal-stati')">Chiudi</button>
+      <button class="cancel" onclick="closeModal('modal-stati')">Chiudi</button>
       <button class="confirm" onclick="saveStati()">Salva stati</button>
     </div>
   </div>
